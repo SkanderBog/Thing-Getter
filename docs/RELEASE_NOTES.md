@@ -10,8 +10,21 @@ The first desktop release of Thing-Getter brings catalogue search, link inspecti
 - Use packaged media support without installing Python or yt-dlp.
 - Switch between light, dark and system appearance.
 
-The CLI remains available from source. Public source and desktop bundles exclude local development downloads, reports, credentials and machine-specific paths.
+The CLI remains available from source. Public source and desktop bundles exclude private development downloads, reports, credentials and personal machine paths. Packages are built from the public source on native GitHub runners.
 
 Downloads establish transfer evidence, not the correct edition or complete content. Default search covers named catalogues; broader web search needs a configured SearXNG service. Authentication, DRM and CAPTCHA handling are not included.
 
 These releases are unsigned and are not notarized by Apple. See the installation guide for platform instructions and the verification record for automated checks and their limits.
+
+## Downloads
+
+| Platform | Recommended | Alternative |
+| --- | --- | --- |
+| Windows 10 (1809+) / 11, x64 | [Installer](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/Thing-Getter-0.3.0-windows-x64-setup.exe) | [Portable ZIP](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/Thing-Getter-0.3.0-windows-x64.zip) |
+| macOS 13+, Apple Silicon | [DMG](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/Thing-Getter-0.3.0-macos-arm64.dmg) | [App ZIP](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/Thing-Getter-0.3.0-macos-arm64.zip) |
+| macOS 13+, Intel | [DMG](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/Thing-Getter-0.3.0-macos-x64.dmg) | [App ZIP](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/Thing-Getter-0.3.0-macos-x64.zip) |
+| Linux x64, Ubuntu 24.04+ | [Debian package](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/Thing-Getter-0.3.0-linux-x64.deb) | [Portable tar.gz](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/Thing-Getter-0.3.0-linux-x64.tar.gz) |
+
+No Python installation is needed. Extract portable archives completely before launching. Linux requires glibc 2.39+ and Qt platform libraries; the Debian package declares them.
+
+[Installation instructions](https://github.com/SkanderBog/Thing-Getter/blob/main/docs/INSTALL.md) · [Privacy](https://github.com/SkanderBog/Thing-Getter/blob/main/docs/PRIVACY.md) · [Checksums](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/SHA256SUMS.txt)

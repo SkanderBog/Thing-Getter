@@ -3,6 +3,8 @@ import hashlib
 import json
 import subprocess
 import time
+import shutil
+import tempfile
 from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
@@ -40,7 +42,8 @@ def exercise(output):
     fixture = {'query': 'A public domain book', 'providers': [{'name': 'Fixture catalogue', 'status': 'ok', 'count': 1}],
         'results': [{'title': 'A public domain book', 'authors': ['Example Author'], 'url': 'https://example.org/book',
             'provider': 'Fixture catalogue', 'access': 'file_bytes_observed',
-            'files': [{'format': 'application/pdf', 'url': 'https://example.org/book.pdf', 'bytes_reported': 123456}],
+            'files': [{'format': 'application/pdf', 'url': 'https://example.org/book.pdf', 'bytes_reported': 123456},
+                      {'format': 'text/plain', 'url': 'https://example.org/book.txt', 'bytes_reported': 45678}],
             'check': {'url': 'https://example.org/book.pdf', 'access': 'file_bytes_observed', 'mime': 'application/pdf'}}]}
 
     def search(client, query, **kwargs):
@@ -57,7 +60,7 @@ def exercise(output):
             QTest.keyClick(window.query, Qt.Key_Return)
             check('search disables duplicate work and enables cancel', not window.search_button.isEnabled() and window.cancel.isEnabled())
             wait_idle()
-        check('search populates selectable files', window.results.count() == 1 and window.files.rowCount() == 1 and window.save_button.isEnabled())
+        check('search populates selectable files', window.results.count() == 1 and window.files.rowCount() == 2 and window.save_button.isEnabled())
         window.apply_theme('Light')
         QTest.qWait(30)
         window.grab().save(str(output / 'desktop-light.png'))
@@ -65,6 +68,13 @@ def exercise(output):
         window.resize(900, 700)
         QTest.qWait(30)
         window.grab().save(str(output / 'desktop-dark.png'))
+        window.files.selectRow(1)
+        with patch('desktop.worker.inspect_url', return_value={'url': 'https://example.org/book.txt', 'access': 'file_bytes_observed', 'mime': 'text/plain'}):
+            window.inspect_selected()
+            check('active work locks result selection', not window.results.isEnabled() and not window.files.isEnabled())
+            wait_idle()
+        check('checking a second format preserves its selection', window.selected_file()['url'].endswith('book.txt'))
+        window.files.selectRow(0)
 
         target = output / 'example.pdf'
         payload = b'%PDF-1.4\nOffline desktop test fixture\n%%EOF\n'
@@ -132,7 +142,10 @@ def run(output):
     output.mkdir(parents=True, exist_ok=True)
     watchdog = (output / 'watchdog.log').open('w')
     faulthandler.dump_traceback_later(90, file=watchdog, exit=True)
-    checks = exercise(output)
+    with tempfile.TemporaryDirectory(prefix='fixture-', dir=output) as directory:
+        checks = exercise(directory)
+        for name in ('desktop-light.png', 'desktop-dark.png'):
+            shutil.copy2(Path(directory) / name, output / name)
     options = {'creationflags': subprocess.CREATE_NO_WINDOW} if __import__('sys').platform == 'win32' else {}
     result = subprocess.run(command() + ['--version'], capture_output=True, text=True, timeout=60, **options)
     if result.returncode != 0 or not result.stdout.strip():

@@ -348,6 +348,8 @@ class Window(QMainWindow):
         self.thread.finished.connect(self.thread.deleteLater)
         self.search_button.setEnabled(False)
         self.query.setEnabled(False)
+        self.results.setEnabled(False)
+        self.files.setEnabled(False)
         self.export.setEnabled(False)
         self.cancel.setEnabled(True)
         self.progress.setRange(0, 0)
@@ -400,6 +402,9 @@ class Window(QMainWindow):
                 self.items[index]['check'] = result
                 self.items[index]['access'] = result['access']
                 self.show_item(index)
+                file_index = self.options.get('parent_file_index', 0)
+                if file_index < self.files.rowCount():
+                    self.files.selectRow(file_index)
             else:
                 item = {'title': result.get('title') or result['url'], 'url': result['url'], 'authors': [], 'provider': 'Direct link',
                         'access': result['access'], 'downloadability': result.get('downloadability', 'unknown'),
@@ -417,6 +422,8 @@ class Window(QMainWindow):
         self.thread = self.worker = None
         self.search_button.setEnabled(True)
         self.query.setEnabled(True)
+        self.results.setEnabled(True)
+        self.files.setEnabled(True)
         self.cancel.setEnabled(False)
         self.progress.hide()
         self.export.setEnabled(self.report is not None)
@@ -501,7 +508,7 @@ class Window(QMainWindow):
     def inspect_selected(self):
         file = self.selected_file()
         if file:
-            self.start('inspect', {'url': file['url'], 'media': False, 'parent_index': self.results.currentRow()})
+            self.start('inspect', {'url': file['url'], 'media': False, 'parent_index': self.results.currentRow(), 'parent_file_index': self.files.currentRow()})
 
     def save_selected(self, media=False):
         item, file = self.current_item(), self.selected_file()

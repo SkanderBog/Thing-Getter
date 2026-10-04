@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 from urllib.parse import urlsplit
 
-from resource_scout.net import Client, ScoutError, normalize, validate_url, Redirects
+from resource_scout.net import Client, ScoutError, Cancelled, normalize, validate_url, Redirects
 from resource_scout.inspect import inspect_url, sniff
 from resource_scout.download import download_file
 from resource_scout.discovery import search, candidate, enrich_archive, searxng, gutendex
@@ -108,6 +108,22 @@ class IntegrationTests(unittest.TestCase):
 
     def url(self, path):
         return self.base + path
+
+    def test_cancelled_download_resumes_without_losing_bytes(self):
+        event = threading.Event()
+        self.client.cancel_event = event
+        target = self.root / 'cancelled.pdf'
+        with self.assertRaises(Cancelled):
+            download_file(self.client, self.url('/file.pdf'), target, progress=lambda count, total: event.set())
+        self.assertFalse(target.exists())
+        partial = target.with_name(target.name + '.part')
+        saved = partial.stat().st_size
+        self.assertGreater(saved, 0)
+        self.assertLess(saved, len(PAYLOAD))
+        event.clear()
+        result = download_file(self.client, self.url('/file.pdf'), target)
+        self.assertEqual(result['resumed_from_bytes'], saved)
+        self.assertEqual(target.read_bytes(), PAYLOAD)
 
     def partial(self, path, count=50000):
         target = self.root / "book.pdf"

@@ -31,7 +31,7 @@ class SlowHandler(Handler):
                     self.wfile.write(bytes([byte]))
                     self.wfile.flush()
                     time.sleep(.025)
-            except (BrokenPipeError, ConnectionResetError):
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
                 pass
             return
         if self.path == '/retry':
@@ -172,8 +172,7 @@ class DiscoveryWorkflowTests(unittest.TestCase):
     def test_budget_is_thread_local_and_restored(self):
         errors = []
         def expired():
-            with self.client.budget(.001):
-                time.sleep(.01)
+            with self.client.budget(0):
                 try:
                     self.client.remaining()
                 except ScoutError:
@@ -268,7 +267,7 @@ class SelectionAndCliTests(unittest.TestCase):
         output = self.root / 'report with spaces.html'
         with patch('resource_scout.discovery.archive', return_value=[]), patch('resource_scout.cli.webbrowser.open', return_value=True) as browser, redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             main(['--cache', ':memory:', 'search', 'Book', '--providers', 'archive', '--verify', '0', '--html', str(output), '--open'])
-        browser.assert_called_once_with(output.as_uri())
+            browser.assert_called_once_with(output.resolve().as_uri())
         self.assertTrue(output.exists())
 
     def test_report_contains_quoted_download_command(self):

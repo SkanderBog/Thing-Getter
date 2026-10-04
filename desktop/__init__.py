@@ -1,0 +1,1 @@
+"""Thing-Getter desktop interface."""

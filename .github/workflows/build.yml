@@ -1,0 +1,74 @@
+name: Build and test desktop apps
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**', '*.md']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            platform: linux-x64
+          - runner: windows-2025
+            platform: windows-x64
+          - runner: macos-15
+            platform: macos-arm64
+          - runner: macos-15-intel
+            platform: macos-x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PYTHONUTF8: '1'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Linux system dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libgl1 libegl1 libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 libdbus-1-3 libfontconfig1 libx11-xcb1 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0
+      - name: Install build dependencies
+        run: |
+          python -m pip install -r requirements-build.txt
+          python -m pip install -e . --no-deps
+      - name: Audit public source
+        run: python scripts/audit_public.py
+      - name: Source regression and GUI tests
+        run: python -m unittest discover -s tests -v
+      - name: Collect library notices
+        run: python scripts/collect_licenses.py
+      - name: Freeze desktop application
+        run: python -m PyInstaller --noconfirm Thing-Getter.spec
+      - name: Test frozen application and bundled media helper
+        run: python scripts/test_package.py
+      - name: Create native archives and installers
+        run: python scripts/package.py
+      - name: Verify installer and archive contents
+        run: python scripts/verify_package.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Thing-Getter-${{ matrix.platform }}
+          path: release/*
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: verification-${{ matrix.platform }}
+          path: build/smoke*/**
+          if-no-files-found: warn
+          retention-days: 14

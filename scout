@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+SCOUT_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# Load this checkout while resolving --out, --json and --cache from the caller.
+export PYTHONPATH="$SCOUT_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+if [ -n "${SCOUT_PYTHON:-}" ]; then
+    exec "$SCOUT_PYTHON" -m resource_scout "$@"
+elif [ -x "$SCOUT_ROOT/.venv/bin/python" ]; then
+    exec "$SCOUT_ROOT/.venv/bin/python" -m resource_scout "$@"
+else
+    exec python3 -m resource_scout "$@"
+fi

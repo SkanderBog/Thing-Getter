@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "resource-scout"
+version = "0.3.0"
+description = "Evidence-first resource discovery and bounded downloads"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+video = ["yt-dlp==2026.8.19"]
+desktop = ["PySide6-Essentials==6.11.2", "yt-dlp==2026.8.19", "certifi==2026.7.22"]
+
+[project.scripts]
+resource-scout = "resource_scout.cli:main"
+
+[project.gui-scripts]
+thing-getter = "desktop.app:run"
+
+[tool.setuptools.packages.find]
+include = ["resource_scout*", "desktop*"]
+
+[tool.setuptools.package-data]
+desktop = ["assets/*"]

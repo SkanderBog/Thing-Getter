@@ -54,9 +54,10 @@ for name, url in sources.items():
                 with tar.extractfile(member) as stream:
                     destination.write_bytes(stream.read())
 if sys.platform.startswith('linux'):
+    urllib.request.urlretrieve('https://raw.githubusercontent.com/unicode-org/icu/release-73-2/LICENSE', output / 'ICU-73.2-LICENSE.txt')
     # Preserve packaged system-library notices; no machine configuration is read.
     docs = Path('/usr/share/doc')
-    for pattern in ('libssl*', 'libx*', 'libglib*', 'libpcre*', 'libfontconfig*', 'libfreetype*', 'libpng*', 'libharfbuzz*', 'libzstd*', 'zlib*', 'libbz2*', 'liblzma*', 'libffi*', 'libexpat*', 'libdbus*'):
+    for pattern in ('lib*', 'zlib*', 'gcc*'):
         for folder in docs.glob(pattern):
             if (folder / 'copyright').is_file():
                 destination = output / 'system' / folder.name

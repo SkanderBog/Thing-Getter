@@ -6,7 +6,7 @@ Download files only from the [GitHub releases page](https://github.com/SkanderBo
 
 Use the `windows-x64-setup.exe` installer. It installs for your user without administrator access and adds a Start menu shortcut and uninstaller. An optional desktop shortcut is offered.
 
-The `windows-x64.zip` is portable: extract the entire folder and launch `Thing-Getter.exe`. Keep the `_internal` directory beside it. Windows 10/11 x64 is the intended target; automated builds are exercised on Windows Server 2025. The unsigned installer/application may show a SmartScreen warning. Verify its source and checksum before choosing to run it.
+The `windows-x64.zip` is portable: extract the entire folder and launch `Thing-Getter.exe`. Keep the `_internal` directory beside it. Windows 10 (1809+) or Windows 11 x64 is the intended target; automated builds are exercised on Windows Server 2025. The unsigned installer/application may show a SmartScreen warning. Verify its source and checksum before choosing to run it.
 
 ## macOS
 

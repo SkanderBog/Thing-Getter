@@ -10,6 +10,7 @@ Thing-Getter and its original icon are MIT licensed. Bundles include the followi
 | yt-dlp | 2026.8.19 | Unlicense; [source and notices](https://github.com/yt-dlp/yt-dlp/tree/2026.08.19) |
 | PyInstaller bootloader | 6.22.3 | GPLv2 with distribution exception; [source](https://github.com/pyinstaller/pyinstaller/tree/v6.22.3) |
 | certifi | 2026.7.22 | MPL 2.0 certificate bundle; [source](https://github.com/certifi/python-certifi) |
+| ICU (Linux Qt dependency) | 73.2 | Unicode/ICU license; [source and notices](https://github.com/unicode-org/icu/tree/release-73-2) |
 
 License texts and available library notices are copied into each bundle's `licenses` directory. Qt/PySide6 is dynamically linked, without modifications, under the LGPL option where applicable. GPL-only optional Qt modules are not used. Consult the individual library notices for included third-party code. Build-time Pillow is not required by the application.
 

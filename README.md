@@ -4,7 +4,7 @@
 
 A desktop app for finding, inspecting and saving books, videos and audio. Search public catalogues, check available formats and sizes, then save a file through a native dialog. Python and the media backend are included in the desktop downloads.
 
-**[Download the latest release](https://github.com/SkanderBog/Thing-Getter/releases/latest)** · [Installation](docs/INSTALL.md) · [Privacy](docs/PRIVACY.md) · [Build and test](docs/DEVELOPMENT.md)
+**[Download the latest release](https://github.com/SkanderBog/Thing-Getter/releases/latest)** · [Installation](docs/INSTALL.md) · [Privacy](docs/PRIVACY.md) · [Verification](docs/VERIFICATION.md) · [Build and test](docs/DEVELOPMENT.md)
 
 ![Thing-Getter desktop interface with an offline example result](docs/desktop.png)
 

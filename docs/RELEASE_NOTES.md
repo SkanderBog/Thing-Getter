@@ -28,3 +28,7 @@ These releases are unsigned and are not notarized by Apple. See the installation
 No Python installation is needed. Extract portable archives completely before launching. Linux requires glibc 2.39+ and Qt platform libraries; the Debian package declares them.
 
 [Installation instructions](https://github.com/SkanderBog/Thing-Getter/blob/main/docs/INSTALL.md) · [Privacy](https://github.com/SkanderBog/Thing-Getter/blob/main/docs/PRIVACY.md) · [Checksums](https://github.com/SkanderBog/Thing-Getter/releases/download/v0.3.0/SHA256SUMS.txt)
+
+## Verification
+
+All four [native build jobs passed](https://github.com/SkanderBog/Thing-Getter/actions/runs/37175987332): 92 source tests on each platform, plus 26 checks of each frozen app and another 26 after installing, extracting or mounting its native package. The public Git history passed Gitleaks. [Full verification record and limitations](https://github.com/SkanderBog/Thing-Getter/blob/main/docs/VERIFICATION.md).

@@ -1,0 +1,65 @@
+name: Upload verified release artifacts
+on:
+  workflow_dispatch:
+    inputs:
+      build_run:
+        description: Successful native build run ID
+        required: true
+        type: string
+      tag:
+        description: Existing release tag with a draft release
+        required: true
+        type: string
+permissions:
+  contents: write
+  actions: read
+jobs:
+  upload:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      BUILD_RUN: ${{ inputs.build_run }}
+      RELEASE_TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.tag }}
+      - name: Check build revision and draft release
+        run: |
+          gh run view "$BUILD_RUN" --json headSha,conclusion,workflowName > run.json
+          gh release view "$RELEASE_TAG" --json isDraft > draft.json
+          python - <<'PY'
+          import json, subprocess
+          run = json.load(open('run.json'))
+          assert run['conclusion'] == 'success'
+          assert run['workflowName'] == 'Build and test desktop apps'
+          assert run['headSha'] == subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          assert json.load(open('draft.json'))['isDraft'], 'Only draft releases can be populated'
+          PY
+      - name: Download and verify native artifacts
+        run: |
+          gh run download "$BUILD_RUN" --pattern 'Thing-Getter-*' --dir artifacts
+          python - <<'PY'
+          import hashlib, shutil
+          from pathlib import Path
+          output = Path('upload')
+          output.mkdir()
+          checks = []
+          manifests = list(Path('artifacts').rglob('*-SHA256SUMS.txt'))
+          assert len(manifests) == 4
+          for manifest in manifests:
+              for line in manifest.read_text().splitlines():
+                  expected, name = line.split('  ', 1)
+                  assert Path(name).name == name
+                  source = manifest.parent / name
+                  actual = hashlib.sha256(source.read_bytes()).hexdigest()
+                  assert actual == expected, name
+                  shutil.copy2(source, output / name)
+                  checks.append((name, actual))
+          assert len(checks) == 8 and len({n for n, _ in checks}) == 8
+          (output / 'SHA256SUMS.txt').write_text(''.join(f'{digest}  {name}\n' for name, digest in sorted(checks)))
+          PY
+      - name: Upload packages to draft
+        run: gh release upload "$RELEASE_TAG" upload/* --clobber

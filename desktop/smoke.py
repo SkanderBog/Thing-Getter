@@ -10,6 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
+from PySide6.QtGui import QRawFont
 from desktop.app import Window, application
 from desktop.state import Store
 from resource_scout.media import command
@@ -53,6 +54,7 @@ def exercise(output):
 
     try:
         check('native app icon loads', not window.windowIcon().isNull())
+        check('bundled font renders text glyphs', bool(app.property('thingGetterFontLoaded')) and QRawFont.fromFont(window.font()).supportsCharacter('A'))
         window.search()
         check('empty search explains what to enter', 'Enter a title' in window.status.text())
         with patch('desktop.worker.search', side_effect=search):

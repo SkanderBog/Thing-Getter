@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from urllib.parse import urlsplit
 from PySide6.QtCore import Qt, QThread, QUrl, QSize, QTimer
-from PySide6.QtGui import QAction, QDesktopServices, QIcon, QKeySequence
+from PySide6.QtGui import QAction, QDesktopServices, QIcon, QKeySequence, QFont, QFontDatabase
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFormLayout,
     QFrame, QHBoxLayout, QHeaderView, QLabel, QLineEdit, QListWidget, QListWidgetItem,
     QMainWindow, QMessageBox, QProgressBar, QPushButton, QScrollArea, QSpinBox, QSplitter,
@@ -589,6 +589,12 @@ class Window(QMainWindow):
 
 def application():
     app = QApplication.instance() or QApplication(sys.argv[:1])
+    if not app.property('thingGetterFontLoaded'):
+        font_id = QFontDatabase.addApplicationFont(str(asset('NotoSans.ttf')))
+        families = QFontDatabase.applicationFontFamilies(font_id)
+        if families:
+            app.setFont(QFont(families[0], 10))
+        app.setProperty('thingGetterFontLoaded', bool(families))
     app.setApplicationName('Thing-Getter')
     app.setOrganizationName('ThingGetter')
     app.setApplicationVersion(__version__)

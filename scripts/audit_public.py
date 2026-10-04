@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ROOT_FILES = {'.gitignore', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'pyproject.toml',
               'requirements-desktop.txt', 'requirements-build.txt', 'scout', 'Thing-Getter.spec'}
 TREES = {'resource_scout', 'desktop', 'docs', 'scripts', '.github', 'tests'}
-SUFFIXES = {'.py', '.md', '.txt', '.toml', '.yml', '.yaml', '.iss', '.svg', '.png', '.ico', '.icns'}
+SUFFIXES = {'.py', '.md', '.txt', '.toml', '.yml', '.yaml', '.iss', '.svg', '.png', '.ico', '.icns', '.ttf'}
 
 
 def allowed(path):
